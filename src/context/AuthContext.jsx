@@ -31,21 +31,22 @@ export const AuthProvider = ({ children }) => {
       const voterRef = doc(db, 'voters', userId);
       const voterSnap = await getDoc(voterRef);
       setHasVoted(voterSnap.exists());
+      return voterSnap.exists();
     } catch (error) {
       console.error('Error checking voting status:', error);
+      return false;
     }
   };
 
-  // Sign up function
+  // Sign up function - KEEPS USER LOGGED IN
   const signup = async (email, password) => {
-    // Validate email domain
     if (!isValidKabaleEmail(email)) {
       throw new Error('Only @kab.ac.ug emails are allowed');
     }
 
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     
-    // Send verification email
+    // Send verification email but KEEP USER LOGGED IN
     await sendEmailVerification(userCredential.user);
     
     return userCredential.user;
@@ -53,14 +54,11 @@ export const AuthProvider = ({ children }) => {
 
   // Login function
   const login = async (email, password) => {
-    // Validate email domain
     if (!isValidKabaleEmail(email)) {
       throw new Error('Only @kab.ac.ug emails are allowed');
     }
 
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    
-    // Check voting status
     await checkVotingStatus(userCredential.user.uid);
     
     return userCredential.user;
@@ -76,6 +74,23 @@ export const AuthProvider = ({ children }) => {
   const resendVerificationEmail = async () => {
     if (currentUser) {
       await sendEmailVerification(currentUser);
+    }
+  };
+
+  // FIXED: Reload user to check verification status
+  const reloadUser = async () => {
+    try {
+      if (auth.currentUser) {
+        // Use auth.currentUser instead of currentUser from state
+        await auth.currentUser.reload();
+        // Update state with fresh user data
+        setCurrentUser({ ...auth.currentUser });
+        return auth.currentUser.emailVerified;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error reloading user:', error);
+      return false;
     }
   };
 
@@ -117,6 +132,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     resendVerificationEmail,
+    reloadUser,
     markAsVoted,
     loading
   };

@@ -8,8 +8,8 @@ import PositionCard from './PositionCard';
 import LoadingSpinner from '../Shared/LoadingSpinner';
 
 const VotingPage = () => {
-  const { currentUser, hasVoted, markAsVoted } = useAuth();
-  const { submitVotes } = useVotes();
+  const { currentUser } = useAuth();
+  const { submitVotes, hasVoted } = useVotes();
   const navigate = useNavigate();
   
   const [selectedVotes, setSelectedVotes] = useState({});
@@ -19,8 +19,21 @@ const VotingPage = () => {
 
   // Check if email is verified
   useEffect(() => {
-    if (!currentUser?.emailVerified) {
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
+
+    if (!currentUser.emailVerified) {
       navigate('/verify-email');
+      return;
+    }
+
+    // Check if user has @kab.ac.ug email
+    if (!currentUser.email?.endsWith('@kab.ac.ug')) {
+      alert('Only Kabale University students can vote');
+      navigate('/');
+      return;
     }
   }, [currentUser, navigate]);
 
@@ -65,25 +78,35 @@ const VotingPage = () => {
     setError('');
 
     try {
+      console.log('Submitting votes:', selectedVotes);
+      console.log('Current user:', currentUser?.email);
+      
       // Submit votes to Firestore
       const result = await submitVotes(selectedVotes);
       
       if (result.success) {
-        // Mark user as voted
-        await markAsVoted();
+        console.log('Vote submitted successfully!');
         
-        // Redirect to success page
+        // ✅ NO ALERT - Just redirect smoothly to success page
         navigate('/success');
       } else {
+        console.error('Vote submission failed:', result.error);
         setError(result.error || 'Failed to submit votes. Please try again.');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (err) {
-      setError('An error occurred while submitting your vote. Please try again.');
-      console.error('Vote submission error:', err);
+      console.error('Unexpected error during vote submission:', err);
+      setError('An unexpected error occurred while submitting your vote. Please try again.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setSubmitting(false);
     }
   };
+
+  // Show loading spinner while checking authentication
+  if (!currentUser) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
@@ -98,6 +121,9 @@ const VotingPage = () => {
             </h1>
             <p className="text-gray-600 text-lg">
               Select one candidate for each position below
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              Voting as: <span className="font-semibold text-purple-600">{currentUser?.email}</span>
             </p>
           </div>
 
@@ -127,7 +153,15 @@ const VotingPage = () => {
           {/* Error Message */}
           {error && (
             <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg animate-slide-up">
-              <p className="text-red-700 font-medium">{error}</p>
+              <div className="flex items-start">
+                <span className="text-2xl mr-3">⚠️</span>
+                <div>
+                  <p className="text-red-700 font-medium">{error}</p>
+                  <p className="text-red-600 text-sm mt-1">
+                    If this problem persists, please contact the administrator.
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 
