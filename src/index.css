@@ -30,13 +30,14 @@ code {
   background: #f1f1f1;
 }
 
+/* Updated with Golden Yellow + Matching Colors */
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #8b5cf6, #3b82f6);
+  background: linear-gradient(to bottom, #facc15, #fbbf24, #f59e0b);
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #7c3aed, #2563eb);
+  background: linear-gradient(to bottom, #fbbf24, #f59e0b, #d97706);
 }
 
 /* Smooth Animations */
@@ -75,9 +76,9 @@ code {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Gradient Text */
+/* Gradient Text – Updated with Gold + Deep Purple */
 .gradient-text {
-  background: linear-gradient(to right, #8b5cf6, #3b82f6);
+  background: linear-gradient(to right, #facc15, #a855f7, #3b82f6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -98,7 +99,8 @@ code {
   transition: all 0.3s ease;
 }
 
+/* Updated card hover with purple + gold glow */
 .card-hover:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 15px 35px rgba(250, 204, 21, 0.4);
 }

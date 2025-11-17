@@ -38,18 +38,38 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Sign up function - KEEPS USER LOGGED IN
-  const signup = async (email, password) => {
+  // UPDATED: Sign up function with profile data
+  const signup = async (email, password, profileData) => {
     if (!isValidKabaleEmail(email)) {
       throw new Error('Only @kab.ac.ug emails are allowed');
     }
 
+    // Create Firebase Auth account
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Save user profile to Firestore
+    try {
+      await setDoc(doc(db, 'users', user.uid), {
+        uid: user.uid,
+        email: email,
+        fullName: profileData.fullName,
+        course: profileData.course,
+        yearOfStudy: profileData.yearOfStudy,
+        registrationNumber: profileData.registrationNumber,
+        createdAt: new Date().toISOString(),
+        emailVerified: false,
+        accountStatus: 'active' // Can be: active, suspended, flagged
+      });
+    } catch (error) {
+      console.error('Error saving user profile:', error);
+      // Don't throw error here - user is already created in Firebase Auth
+    }
     
-    // Send verification email but KEEP USER LOGGED IN
-    await sendEmailVerification(userCredential.user);
+    // Send verification email and KEEP USER LOGGED IN
+    await sendEmailVerification(user);
     
-    return userCredential.user;
+    return user;
   };
 
   // Login function
@@ -83,8 +103,25 @@ export const AuthProvider = ({ children }) => {
       if (auth.currentUser) {
         // Use auth.currentUser instead of currentUser from state
         await auth.currentUser.reload();
+        
+        // Force token refresh to get updated email_verified claim
+        await auth.currentUser.getIdToken(true);
+        
         // Update state with fresh user data
         setCurrentUser({ ...auth.currentUser });
+        
+        // Update Firestore profile if email is now verified
+        if (auth.currentUser.emailVerified) {
+          try {
+            await setDoc(doc(db, 'users', auth.currentUser.uid), {
+              emailVerified: true,
+              verifiedAt: new Date().toISOString()
+            }, { merge: true });
+          } catch (error) {
+            console.error('Error updating verification status:', error);
+          }
+        }
+        
         return auth.currentUser.emailVerified;
       }
       return false;
@@ -104,6 +141,21 @@ export const AuthProvider = ({ children }) => {
         hasVoted: true
       });
       setHasVoted(true);
+    }
+  };
+
+  // Get user profile
+  const getUserProfile = async (userId) => {
+    try {
+      const userRef = doc(db, 'users', userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        return userSnap.data();
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting user profile:', error);
+      return null;
     }
   };
 
@@ -134,6 +186,7 @@ export const AuthProvider = ({ children }) => {
     resendVerificationEmail,
     reloadUser,
     markAsVoted,
+    getUserProfile,
     loading
   };
 
