@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user has @kab.ac.ug email
+    function isKabaleStudent() {
+      return request.auth != null && 
+             request.auth.token.email.matches('.*@kab[.]ac[.]ug$');
+    }
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.email == '2023akcs4987gf@kab.ac.ug';
+    }
+    
+    // Helper function to check if user has already voted
+    function hasNotVoted() {
+      return !exists(/databases/$(database)/documents/voters/$(request.auth.uid));
+    }
+    
+    // Voters collection - tracks who has voted
+    match /voters/{userId} {
+      // Users can only create their own voter record once
+      allow create: if request.auth.uid == userId && 
+                      isKabaleStudent() && 
+                      hasNotVoted() &&
+                      request.auth.token.email_verified == true;
+      
+      // Users can read their own voting status
+      allow read: if request.auth.uid == userId || isAdmin();
+      
+      // No updates or deletes allowed
+      allow update, delete: if false;
+    }
+    
+    // Votes collection - stores actual vote counts
+    match /votes/{position} {
+      // Only authenticated, verified Kabale students who haven't voted can write
+      allow create, update: if isKabaleStudent() && 
+                              request.auth.token.email_verified == true &&
+                              hasNotVoted();
+      
+      // Only admins can read vote counts
+      allow read: if isAdmin();
+      
+      // No deletes allowed
+      allow delete: if false;
+    }
+    
+    // Admin collection - stores admin emails
+    match /admins/{email} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
