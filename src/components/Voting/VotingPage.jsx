@@ -17,7 +17,6 @@ const VotingPage = () => {
   const [error, setError] = useState('');
   const positions = getAllPositions();
 
-  // Check if email is verified
   useEffect(() => {
     if (!currentUser) {
       navigate('/login');
@@ -29,7 +28,6 @@ const VotingPage = () => {
       return;
     }
 
-    // Check if user has @kab.ac.ug email
     if (!currentUser.email?.endsWith('@kab.ac.ug')) {
       alert('Only Kabale University students can vote');
       navigate('/');
@@ -37,14 +35,12 @@ const VotingPage = () => {
     }
   }, [currentUser, navigate]);
 
-  // Check if already voted
   useEffect(() => {
     if (hasVoted) {
       navigate('/success');
     }
   }, [hasVoted, navigate]);
 
-  // Handle candidate selection
   const handleSelectCandidate = (positionId, candidate) => {
     setSelectedVotes(prev => ({
       ...prev,
@@ -53,21 +49,17 @@ const VotingPage = () => {
     setError('');
   };
 
-  // Check if all positions have selections
   const allPositionsSelected = () => {
     return positions.every(position => selectedVotes[position.id]);
   };
 
-  // Calculate progress
   const getProgress = () => {
     const selected = Object.keys(selectedVotes).length;
     const total = positions.length;
     return Math.round((selected / total) * 100);
   };
 
-  // Handle vote submission
   const handleSubmit = async () => {
-    // Validate all positions selected
     if (!allPositionsSelected()) {
       setError('Please select a candidate for all positions before submitting');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -78,32 +70,22 @@ const VotingPage = () => {
     setError('');
 
     try {
-      console.log('Submitting votes:', selectedVotes);
-      console.log('Current user:', currentUser?.email);
-      
-      // Submit votes to Firestore
       const result = await submitVotes(selectedVotes);
       
       if (result.success) {
-        console.log('Vote submitted successfully!');
-        
-        // ✅ NO ALERT - Just redirect smoothly to success page
         navigate('/success');
       } else {
-        console.error('Vote submission failed:', result.error);
         setError(result.error || 'Failed to submit votes. Please try again.');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (err) {
-      console.error('Unexpected error during vote submission:', err);
-      setError('An unexpected error occurred while submitting your vote. Please try again.');
+      setError('An unexpected error occurred. Please try again.');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Show loading spinner while checking authentication
   if (!currentUser) {
     return <LoadingSpinner />;
   }
@@ -112,52 +94,61 @@ const VotingPage = () => {
     <>
       <Navbar />
       
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 py-8 px-4">
+      <div className="min-h-screen bg-gradient-dark py-8 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8 animate-fade-in">
-            <h1 className="text-4xl md:text-5xl font-bold gradient-text mb-4">
+            <div className="inline-block mb-4">
+              <div className="w-20 h-20 mx-auto bg-gradient-gold rounded-full flex items-center justify-center glow-gold shadow-glow-gold float-animation">
+                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+              </div>
+            </div>
+            <h1 className="text-5xl font-bold gradient-text mb-4">
               Cast Your Vote
             </h1>
-            <p className="text-gray-600 text-lg">
+            <p className="text-white/80 text-lg">
               Select one candidate for each position below
             </p>
-            <p className="text-sm text-gray-500 mt-2">
-              Voting as: <span className="font-semibold text-purple-600">{currentUser?.email}</span>
+            <p className="text-sm text-gold-300 mt-2">
+              Voting as: <span className="font-semibold">{currentUser?.email}</span>
             </p>
           </div>
 
           {/* Progress Bar */}
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-8 animate-slide-up">
+          <div className="glass-effect rounded-xl shadow-gold p-6 mb-8 animate-slide-up border border-gold-300/30">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-sm font-semibold text-gray-700">
+              <span className="text-sm font-semibold text-white/90">
                 Voting Progress
               </span>
-              <span className="text-sm font-bold text-purple-600">
+              <span className="text-sm font-bold text-gold-400">
                 {Object.keys(selectedVotes).length} / {positions.length} positions
               </span>
             </div>
             
-            <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+            <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden backdrop-blur-sm">
               <div 
-                className="h-full bg-gradient-to-r from-purple-600 to-blue-600 transition-all duration-500 ease-out rounded-full"
+                className="h-full bg-gradient-gold transition-all duration-500 ease-out rounded-full shimmer"
                 style={{ width: `${getProgress()}%` }}
               ></div>
             </div>
             
-            <p className="text-xs text-gray-500 mt-2 text-center">
+            <p className="text-xs text-white/70 mt-2 text-center">
               {getProgress() === 100 ? '✓ All positions selected! Ready to submit.' : 'Please complete all positions'}
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg animate-slide-up">
+            <div className="glass-effect rounded-xl p-4 mb-6 border-l-4 border-red-400 animate-slide-up">
               <div className="flex items-start">
-                <span className="text-2xl mr-3">⚠️</span>
+                <svg className="w-6 h-6 text-red-400 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
                 <div>
-                  <p className="text-red-700 font-medium">{error}</p>
-                  <p className="text-red-600 text-sm mt-1">
+                  <p className="text-red-300 font-medium">{error}</p>
+                  <p className="text-red-400 text-sm mt-1">
                     If this problem persists, please contact the administrator.
                   </p>
                 </div>
@@ -167,7 +158,7 @@ const VotingPage = () => {
 
           {/* Position Cards */}
           <div className="space-y-6 mb-8">
-            {positions.map((position, index) => (
+            {positions.map((position) => (
               <PositionCard
                 key={position.id}
                 position={position}
@@ -178,13 +169,13 @@ const VotingPage = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="sticky bottom-4 bg-white rounded-xl shadow-2xl p-6 border-2 border-purple-200 animate-slide-up">
+          <div className="sticky bottom-4 glass-effect rounded-xl shadow-glow-gold p-6 border-2 border-gold-300/50 animate-slide-up backdrop-blur-xl">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-center md:text-left">
-                <p className="text-lg font-bold text-gray-800">
+                <p className="text-lg font-bold text-white">
                   Ready to submit your vote?
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-white/70">
                   {allPositionsSelected() 
                     ? 'All positions selected. Click submit below.' 
                     : `Please select ${positions.length - Object.keys(selectedVotes).length} more position(s)`
@@ -197,8 +188,8 @@ const VotingPage = () => {
                 disabled={!allPositionsSelected() || submitting}
                 className={`px-8 py-4 rounded-lg font-bold text-white text-lg transform transition-all duration-300 ${
                   allPositionsSelected() && !submitting
-                    ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:scale-105 shadow-lg cursor-pointer'
-                    : 'bg-gray-400 cursor-not-allowed opacity-50'
+                    ? 'bg-gradient-gold hover:shadow-glow-gold hover:scale-105 shadow-gold cursor-pointer'
+                    : 'bg-gray-600/50 cursor-not-allowed opacity-50'
                 }`}
               >
                 {submitting ? (
@@ -217,10 +208,15 @@ const VotingPage = () => {
           </div>
 
           {/* Important Notice */}
-          <div className="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
-            <p className="text-sm text-blue-800">
-              <span className="font-bold">⚠️ Important:</span> Once you submit your vote, you cannot change it. Please review your selections carefully before submitting.
-            </p>
+          <div className="mt-6 glass-effect rounded-lg p-4 border-l-4 border-gold-400">
+            <div className="flex items-start">
+              <svg className="w-5 h-5 text-gold-400 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              <p className="text-sm text-white/80">
+                <span className="font-bold text-gold-300">⚠️ Important:</span> Once you submit your vote, you cannot change it. Please review your selections carefully before submitting.
+              </p>
+            </div>
           </div>
         </div>
       </div>
