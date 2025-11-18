@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useVotes } from '../../hooks/useVotes';
 import { getAllPositions } from '../../config/positions';
-import { collection, query, getDocs } from 'firebase/firestore';
+import { collection, query, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { 
   BarChart3, 
@@ -14,37 +14,58 @@ import {
   FileText, 
   Download,
   FileSpreadsheet,
-  FileBarChart
+  FileBarChart,
+  RefreshCw
 } from 'lucide-react';
 import Navbar from '../Shared/Navbar';
 import ResultsChart from './ResultsChart';
 import LoadingSpinner from '../Shared/LoadingSpinner';
 
 const AdminDashboard = () => {
-  const { votes, loading: votesLoading, getPositionVotes, getTotalVotes } = useVotes();
+  const { votes, loading: votesLoading, getPositionVotes, getTotalVotes, refreshVotes } = useVotes();
   const { currentUser } = useAuth();
   const [totalVoters, setTotalVoters] = useState(0);
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const positions = getAllPositions();
 
+  // Real-time voters count
   useEffect(() => {
-    const fetchVoters = async () => {
-      try {
-        const votersRef = collection(db, 'voters');
-        const votersQuery = query(votersRef);
-        const votersSnap = await getDocs(votersQuery);
-        setTotalVoters(votersSnap.size);
-      } catch (error) {
-        console.error('Error fetching voters:', error);
-      }
-    };
+    const votersRef = collection(db, 'voters');
+    const unsubscribe = onSnapshot(votersRef, (snapshot) => {
+      setTotalVoters(snapshot.size);
+      setLastUpdate(new Date());
+    });
 
-    fetchVoters();
-  }, [votes]);
+    return () => unsubscribe();
+  }, []);
 
+  // Real-time votes updates
   useEffect(() => {
     setLastUpdate(new Date());
   }, [votes]);
+
+  // Manual refresh function
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshVotes();
+      setLastUpdate(new Date());
+    } catch (error) {
+      console.error('Error refreshing votes:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  // Auto-refresh every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshVotes();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [refreshVotes]);
 
   // Export functions
   const exportToPDF = () => {
@@ -173,7 +194,7 @@ const AdminDashboard = () => {
                 </div>
               </div>
               <p className="text-4xl font-bold" style={{ color: '#f59e0b' }}>{totalVoters}</p>
-              <p className="text-sm text-gray-500 mt-1">Students have voted</p>
+              <p className="text-sm text-gray-500 mt-1">Registered voters</p>
             </div>
 
             {/* Total Votes */}
@@ -213,7 +234,7 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Live Status */}
+          {/* Live Status with Refresh Button */}
           <div className="rounded-xl p-4 mb-8 flex items-center justify-between animate-slide-up" style={{
             background: '#e0e5ec',
             boxShadow: '6px 6px 12px #b8bec5, -6px -6px 12px #ffffff'
@@ -226,9 +247,24 @@ const AdminDashboard = () => {
               <Radio className="w-5 h-5 text-green-500" />
               <span className="text-gray-700 font-medium">Live Updates Active</span>
             </div>
-            <span className="text-gray-500 text-sm">
-              Last updated: {lastUpdate.toLocaleTimeString()}
-            </span>
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-500 text-sm">
+                Last updated: {lastUpdate.toLocaleTimeString()}
+              </span>
+              <button
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="flex items-center space-x-2 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-300"
+                style={{
+                  background: isRefreshing ? '#9ca3af' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  color: 'white',
+                  boxShadow: '2px 2px 4px #b8bec5, -2px -2px 4px #ffffff'
+                }}
+              >
+                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+              </button>
+            </div>
           </div>
 
           {/* Admin Info */}
@@ -252,14 +288,19 @@ const AdminDashboard = () => {
 
           {/* Position Results */}
           <div className="space-y-8">
-            <h2 className="text-3xl font-bold mb-6 animate-fade-in" style={{ 
-              background: 'linear-gradient(135deg, #fbbf24 0%, #a855f7 50%, #3b82f6 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}>
-              Results by Position
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl font-bold animate-fade-in" style={{ 
+                background: 'linear-gradient(135deg, #fbbf24 0%, #a855f7 50%, #3b82f6 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
+                Results by Position
+              </h2>
+              <div className="text-sm text-gray-500">
+                {positions.length} positions • {getTotalVotes()} total votes
+              </div>
+            </div>
 
             {positions.map((position) => (
               <ResultsChart

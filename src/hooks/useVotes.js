@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, doc, getDoc, setDoc, onSnapshot, increment } from 'firebase/firestore';
+import { collection, doc, getDoc, setDoc, onSnapshot, increment, writeBatch } from 'firebase/firestore';
 import { db, auth } from '../config/firebase';
 import { getAllPositions } from '../config/positions';
 
@@ -26,20 +26,43 @@ export const useVotes = () => {
     checkVotingStatus();
   }, []);
 
-  // Listen to real-time vote updates
+  // Listen to real-time vote updates - COMPATIBLE VERSION
   useEffect(() => {
     const positions = getAllPositions();
     const unsubscribers = [];
 
     positions.forEach(position => {
+      // Try both data structures for compatibility
       const voteRef = doc(db, 'votes', position.id);
       
       const unsubscribe = onSnapshot(voteRef, 
         (docSnap) => {
           if (docSnap.exists()) {
+            const voteData = docSnap.data();
+            
+            // Convert the object format to array format for ResultsChart
+            const positionVotes = [];
+            
+            Object.entries(voteData).forEach(([candidateName, count]) => {
+              // Skip metadata fields
+              if (candidateName !== 'votedAt' && candidateName !== 'email' && candidateName !== 'userId') {
+                positionVotes.push({
+                  candidateId: candidateName.replace(/\s+/g, '-').toLowerCase(),
+                  candidateName: candidateName,
+                  count: count || 0
+                });
+              }
+            });
+
             setVotes(prev => ({
               ...prev,
-              [position.id]: docSnap.data()
+              [position.id]: positionVotes
+            }));
+          } else {
+            // If document doesn't exist, set empty array
+            setVotes(prev => ({
+              ...prev,
+              [position.id]: []
             }));
           }
           setLoading(false);
@@ -60,7 +83,7 @@ export const useVotes = () => {
     };
   }, []);
 
-  // Submit votes for all positions
+  // Submit votes for all positions - COMPATIBLE VERSION
   const submitVotes = async (selectedVotes) => {
     try {
       // Ensure user is authenticated
@@ -73,7 +96,7 @@ export const useVotes = () => {
 
       // CRITICAL FIX: Force token refresh to get latest email_verified status
       await auth.currentUser.reload();
-      const idTokenResult = await auth.currentUser.getIdToken(true); // Force refresh
+      const idTokenResult = await auth.currentUser.getIdToken(true);
       
       const userId = auth.currentUser.uid;
       const userEmail = auth.currentUser.email;
@@ -108,23 +131,23 @@ export const useVotes = () => {
       const positions = getAllPositions();
       const votedPositions = [];
 
-      // Update votes for each position
+      // Update votes for each position using the original structure
       for (const position of positions) {
-        const candidateName = selectedVotes[position.id];
+        const candidate = selectedVotes[position.id];
         
-        if (candidateName) {
+        if (candidate) {
           const voteRef = doc(db, 'votes', position.id);
           const voteSnap = await getDoc(voteRef);
 
           if (voteSnap.exists()) {
-            // Increment existing candidate vote
+            // Increment existing candidate vote using the original structure
             await setDoc(voteRef, {
-              [candidateName]: increment(1)
+              [candidate.name]: increment(1)
             }, { merge: true });
           } else {
-            // Create new vote document
+            // Create new vote document using the original structure
             await setDoc(voteRef, {
-              [candidateName]: 1
+              [candidate.name]: 1
             });
           }
 
@@ -132,7 +155,7 @@ export const useVotes = () => {
         }
       }
 
-      // Mark user as having voted (CRITICAL - prevents double voting)
+      // Mark user as having voted
       await setDoc(voterRef, {
         votedAt: new Date().toISOString(),
         email: userEmail,
@@ -174,36 +197,51 @@ export const useVotes = () => {
     }
   };
 
-  // Get votes for a specific position
+  // Get votes for a specific position - SAFE VERSION
   const getPositionVotes = (positionId) => {
-    return votes[positionId] || {};
+    const positionVotes = votes[positionId];
+    
+    // Ensure we always return an array
+    if (!positionVotes) return [];
+    if (!Array.isArray(positionVotes)) return [];
+    
+    return positionVotes;
   };
 
-  // Get total votes across all positions
+  // Get total votes across all positions - SAFE VERSION
   const getTotalVotes = () => {
     let total = 0;
     Object.values(votes).forEach(positionVotes => {
-      Object.values(positionVotes).forEach(count => {
-        total += count;
-      });
+      // Ensure positionVotes is an array before using forEach
+      if (Array.isArray(positionVotes)) {
+        positionVotes.forEach(candidate => {
+          total += candidate.count || 0;
+        });
+      }
     });
     return total;
   };
 
-  // Get winner for a specific position
+  // Get winner for a specific position - SAFE VERSION
   const getPositionWinner = (positionId) => {
-    const positionVotes = votes[positionId] || {};
-    let winner = null;
-    let maxVotes = 0;
+    const positionVotes = getPositionVotes(positionId);
+    if (positionVotes.length === 0) return null;
 
-    Object.entries(positionVotes).forEach(([candidate, voteCount]) => {
-      if (voteCount > maxVotes) {
-        maxVotes = voteCount;
+    let winner = positionVotes[0];
+    positionVotes.forEach(candidate => {
+      if (candidate.count > winner.count) {
         winner = candidate;
       }
     });
 
-    return { candidate: winner, votes: maxVotes };
+    return winner;
+  };
+
+  // Add refresh function for manual updates
+  const refreshVotes = async () => {
+    setLoading(true);
+    // The real-time listener will automatically update
+    setTimeout(() => setLoading(false), 1000);
   };
 
   return {
@@ -214,7 +252,8 @@ export const useVotes = () => {
     submitVotes,
     getPositionVotes,
     getTotalVotes,
-    getPositionWinner
+    getPositionWinner,
+    refreshVotes
   };
 };
 

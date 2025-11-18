@@ -23,11 +23,11 @@ const PositionCard = ({ position, selectedCandidate, onSelectCandidate }) => {
       {/* Candidates Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {position.candidates.map((candidate) => {
-          const isSelected = selectedCandidate === candidate;
+          const isSelected = selectedCandidate && selectedCandidate.id === candidate.id;
           
           return (
             <button
-              key={candidate}
+              key={candidate.id}
               onClick={() => onSelectCandidate(position.id, candidate)}
               className={`
                 relative p-5 rounded-xl transition-all duration-300 transform
@@ -39,29 +39,59 @@ const PositionCard = ({ position, selectedCandidate, onSelectCandidate }) => {
             >
               {/* Candidate Content */}
               <div className="flex items-center space-x-4">
-                {/* Avatar */}
-                <div className={`
-                  w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 transition-all
-                  ${isSelected 
-                    ? 'bg-white text-gold-600' 
-                    : 'bg-gradient-to-br from-gold-400/30 to-royal-400/30 text-white'
-                  }
-                `}>
-                  <span className="text-2xl font-bold">
-                    {candidate.charAt(0).toUpperCase()}
-                  </span>
+                {/* Candidate Image */}
+                <div className="relative flex-shrink-0">
+                  <div className={`
+                    w-14 h-14 rounded-full overflow-hidden border-2 transition-all
+                    ${isSelected ? 'border-white' : 'border-gold-400/50'}
+                  `}>
+                    <img
+                      src={candidate.image}
+                      alt={candidate.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback to initials if image fails to load
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                    {/* Fallback Avatar */}
+                    <div 
+                      className={`
+                        w-full h-full rounded-full flex items-center justify-center
+                        ${isSelected 
+                          ? 'bg-white text-gold-600' 
+                          : 'bg-gradient-to-br from-gold-400/30 to-royal-400/30 text-white'
+                        }
+                      `}
+                      style={{ display: 'none' }}
+                    >
+                      <span className="text-lg font-bold">
+                        {candidate.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Online Indicator */}
+                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
                 </div>
 
-                {/* Candidate Name */}
-                <div className="flex-1 text-left">
+                {/* Candidate Name and Bio */}
+                <div className="flex-1 text-left min-w-0">
                   <p className={`
-                    font-bold text-lg
+                    font-bold text-lg truncate
                     ${isSelected ? 'text-white' : 'text-white/90'}
                   `}>
-                    {candidate}
+                    {candidate.name}
+                  </p>
+                  <p className={`
+                    text-sm truncate
+                    ${isSelected ? 'text-white/80' : 'text-white/60'}
+                  `}>
+                    {candidate.bio}
                   </p>
                   {isSelected && (
-                    <p className="text-sm text-white/80 font-medium">
+                    <p className="text-sm text-white/80 font-medium mt-1">
                       ✓ Selected
                     </p>
                   )}
@@ -96,7 +126,7 @@ const PositionCard = ({ position, selectedCandidate, onSelectCandidate }) => {
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
             <span className="text-sm text-white/90 font-medium">
-              You selected: <span className="text-gold-300 font-bold">{selectedCandidate}</span>
+              You selected: <span className="text-gold-300 font-bold">{selectedCandidate.name}</span>
             </span>
           </div>
         </div>
