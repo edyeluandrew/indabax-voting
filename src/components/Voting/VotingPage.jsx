@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Vote, CheckCircle2, AlertCircle, Send, User, Award } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useVotes } from '../../hooks/useVotes';
 import { getAllPositions } from '../../config/positions';
@@ -11,7 +12,6 @@ const VotingPage = () => {
   const { currentUser } = useAuth();
   const { submitVotes, hasVoted } = useVotes();
   const navigate = useNavigate();
-  
   const [selectedVotes, setSelectedVotes] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -71,7 +71,6 @@ const VotingPage = () => {
 
     try {
       const result = await submitVotes(selectedVotes);
-      
       if (result.success) {
         navigate('/success');
       } else {
@@ -93,62 +92,293 @@ const VotingPage = () => {
   return (
     <>
       <Navbar />
-      
-      <div className="min-h-screen bg-gradient-dark py-8 px-4">
-        <div className="max-w-4xl mx-auto">
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#e0e5ec',
+        paddingTop: '80px',
+        paddingBottom: '40px'
+      }}>
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: '0 20px'
+        }}>
           {/* Header */}
-          <div className="text-center mb-8 animate-fade-in">
-            <div className="inline-block mb-4">
-              <div className="w-20 h-20 mx-auto bg-gradient-gold rounded-full flex items-center justify-center glow-gold shadow-glow-gold float-animation">
-                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                </svg>
+          <div style={{
+            background: '#e0e5ec',
+            borderRadius: '24px',
+            padding: '40px',
+            marginBottom: '30px',
+            boxShadow: '10px 10px 20px #b8bec5, -10px -10px 20px #ffffff',
+            textAlign: 'center'
+          }}>
+            <div style={{
+              display: 'inline-block',
+              marginBottom: '20px'
+            }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                boxShadow: '5px 5px 10px #b8bec5, -5px -5px 10px #ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto'
+              }}>
+                <Vote size={40} color="white" strokeWidth={2.5} />
               </div>
             </div>
-            <h1 className="text-5xl font-bold gradient-text mb-4">
+
+            <h1 style={{
+              fontSize: '2.5rem',
+              fontWeight: '800',
+              background: 'linear-gradient(135deg, #fbbf24 0%, #a855f7 50%, #3b82f6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              marginBottom: '12px'
+            }}>
               Cast Your Vote
             </h1>
-            <p className="text-white/80 text-lg">
+            <p style={{
+              fontSize: '1.1rem',
+              color: '#64748b',
+              marginBottom: '20px',
+              fontWeight: '500'
+            }}>
               Select one candidate for each position below
             </p>
-            <p className="text-sm text-gold-300 mt-2">
-              Voting as: <span className="font-semibold">{currentUser?.email}</span>
-            </p>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: '#e0e5ec',
+              borderRadius: '12px',
+              padding: '12px 24px',
+              boxShadow: 'inset 4px 4px 8px #b8bec5, inset -4px -4px 8px #ffffff'
+            }}>
+              <User size={18} color="#f59e0b" />
+              <span style={{
+                fontSize: '0.95rem',
+                color: '#1e293b',
+                fontWeight: '700'
+              }}>
+                {currentUser?.email}
+              </span>
+            </div>
           </div>
 
           {/* Progress Bar */}
-          <div className="glass-effect rounded-xl shadow-gold p-6 mb-8 animate-slide-up border border-gold-300/30">
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-sm font-semibold text-white/90">
-                Voting Progress
-              </span>
-              <span className="text-sm font-bold text-gold-400">
-                {Object.keys(selectedVotes).length} / {positions.length} positions
-              </span>
+          <div style={{
+            background: '#e0e5ec',
+            borderRadius: '20px',
+            padding: '30px',
+            marginBottom: '30px',
+            boxShadow: '10px 10px 20px #b8bec5, -10px -10px 20px #ffffff'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Award size={24} color="#f59e0b" strokeWidth={2.5} />
+                <h3 style={{
+                  fontSize: '1.3rem',
+                  fontWeight: '700',
+                  color: '#1e293b',
+                  margin: 0
+                }}>
+                  Voting Progress
+                </h3>
+              </div>
+              <div style={{
+                background: getProgress() === 100
+                  ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                  : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '10px',
+                fontWeight: '700',
+                fontSize: '0.95rem',
+                boxShadow: '3px 3px 6px #b8bec5, -3px -3px 6px #ffffff'
+              }}>
+                {Object.keys(selectedVotes).length} / {positions.length}
+              </div>
             </div>
             
-            <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden backdrop-blur-sm">
-              <div 
-                className="h-full bg-gradient-gold transition-all duration-500 ease-out rounded-full shimmer"
-                style={{ width: `${getProgress()}%` }}
-              ></div>
+            {/* Progress Bar */}
+            <div style={{
+              background: '#e0e5ec',
+              borderRadius: '16px',
+              padding: '8px',
+              boxShadow: 'inset 4px 4px 8px #b8bec5, inset -4px -4px 8px #ffffff',
+              marginBottom: '20px'
+            }}>
+              <div style={{
+                height: '24px',
+                background: getProgress() === 100 
+                  ? 'linear-gradient(90deg, #10b981 0%, #059669 100%)'
+                  : 'linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)',
+                borderRadius: '12px',
+                width: `${getProgress()}%`,
+                transition: 'width 0.3s ease',
+                boxShadow: getProgress() === 100
+                  ? '0 2px 8px rgba(16, 185, 129, 0.4)'
+                  : '0 2px 8px rgba(251, 191, 36, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                paddingRight: '8px'
+              }}>
+                {getProgress() > 15 && (
+                  <span style={{
+                    color: 'white',
+                    fontSize: '0.75rem',
+                    fontWeight: '700'
+                  }}>
+                    {getProgress()}%
+                  </span>
+                )}
+              </div>
             </div>
+
+            {/* Selected Candidates Pills */}
+            {Object.keys(selectedVotes).length > 0 && (
+              <div style={{
+                marginTop: '20px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  marginBottom: '12px'
+                }}>
+                  <CheckCircle2 size={18} color="#10b981" strokeWidth={2.5} />
+                  <p style={{
+                    fontSize: '0.9rem',
+                    color: '#475569',
+                    fontWeight: '600',
+                    margin: 0
+                  }}>
+                    Your Selections:
+                  </p>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '10px'
+                }}>
+                  {Object.entries(selectedVotes).map(([positionId, candidate]) => {
+                    const position = positions.find(p => p.id === positionId);
+                    return (
+                      <div
+                        key={positionId}
+                        style={{
+                          background: '#e0e5ec',
+                          borderRadius: '12px',
+                          padding: '10px 16px',
+                          boxShadow: 'inset 3px 3px 6px #b8bec5, inset -3px -3px 6px #ffffff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        <div style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                        }} />
+                        <span style={{
+                          fontSize: '0.85rem',
+                          fontWeight: '600',
+                          color: '#1e293b'
+                        }}>
+                          {position?.title}:
+                        </span>
+                        <span style={{
+                          fontSize: '0.85rem',
+                          fontWeight: '700',
+                          background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent'
+                        }}>
+                          {candidate.name}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             
-            <p className="text-xs text-white/70 mt-2 text-center">
-              {getProgress() === 100 ? '✓ All positions selected! Ready to submit.' : 'Please complete all positions'}
-            </p>
+            <div style={{
+              marginTop: '16px',
+              padding: '12px',
+              background: getProgress() === 100 ? '#d1fae5' : '#fee2e2',
+              borderRadius: '10px',
+              boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.05)'
+            }}>
+              <p style={{
+                fontSize: '0.9rem',
+                color: getProgress() === 100 ? '#065f46' : '#991b1b',
+                textAlign: 'center',
+                margin: 0,
+                fontWeight: '700',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}>
+                {getProgress() === 100 ? (
+                  <>
+                    <CheckCircle2 size={18} strokeWidth={2.5} />
+                    All positions selected! Ready to submit.
+                  </>
+                ) : (
+                  <>
+                    <AlertCircle size={18} strokeWidth={2.5} />
+                    Please complete {positions.length - Object.keys(selectedVotes).length} more position(s)
+                  </>
+                )}
+              </p>
+            </div>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="glass-effect rounded-xl p-4 mb-6 border-l-4 border-red-400 animate-slide-up">
-              <div className="flex items-start">
-                <svg className="w-6 h-6 text-red-400 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <div>
-                  <p className="text-red-300 font-medium">{error}</p>
-                  <p className="text-red-400 text-sm mt-1">
+            <div style={{
+              background: '#e0e5ec',
+              borderRadius: '16px',
+              padding: '20px',
+              marginBottom: '30px',
+              boxShadow: 'inset 5px 5px 10px #dc2626, inset -5px -5px 10px #fca5a5',
+              border: '2px solid #ef4444'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px'
+              }}>
+                <AlertCircle size={24} color="#dc2626" strokeWidth={2.5} />
+                <div style={{ flex: 1 }}>
+                  <p style={{
+                    color: '#991b1b',
+                    fontWeight: '700',
+                    margin: '0 0 8px 0',
+                    fontSize: '1rem'
+                  }}>
+                    {error}
+                  </p>
+                  <p style={{
+                    color: '#dc2626',
+                    fontSize: '0.875rem',
+                    margin: 0,
+                    fontWeight: '500'
+                  }}>
                     If this problem persists, please contact the administrator.
                   </p>
                 </div>
@@ -157,7 +387,11 @@ const VotingPage = () => {
           )}
 
           {/* Position Cards */}
-          <div className="space-y-6 mb-8">
+          <div style={{
+            display: 'grid',
+            gap: '24px',
+            marginBottom: '30px'
+          }}>
             {positions.map((position) => (
               <PositionCard
                 key={position.id}
@@ -169,57 +403,128 @@ const VotingPage = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="sticky bottom-4 glass-effect rounded-xl shadow-glow-gold p-6 border-2 border-gold-300/50 animate-slide-up backdrop-blur-xl">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="text-center md:text-left">
-                <p className="text-lg font-bold text-white">
-                  Ready to submit your vote?
-                </p>
-                <p className="text-sm text-white/70">
-                  {allPositionsSelected() 
-                    ? 'All positions selected. Click submit below.' 
-                    : `Please select ${positions.length - Object.keys(selectedVotes).length} more position(s)`
-                  }
-                </p>
-              </div>
-
-              <button
-                onClick={handleSubmit}
-                disabled={!allPositionsSelected() || submitting}
-                className={`px-8 py-4 rounded-lg font-bold text-white text-lg transform transition-all duration-300 ${
-                  allPositionsSelected() && !submitting
-                    ? 'bg-gradient-gold hover:shadow-glow-gold hover:scale-105 shadow-gold cursor-pointer'
-                    : 'bg-gray-600/50 cursor-not-allowed opacity-50'
-                }`}
-              >
-                {submitting ? (
-                  <span className="flex items-center">
-                    <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    Submitting...
-                  </span>
-                ) : (
-                  '🗳️ Submit My Vote'
-                )}
-              </button>
-            </div>
+          <div style={{
+            background: '#e0e5ec',
+            borderRadius: '20px',
+            padding: '40px',
+            marginBottom: '30px',
+            boxShadow: '10px 10px 20px #b8bec5, -10px -10px 20px #ffffff',
+            textAlign: 'center'
+          }}>
+            <h3 style={{
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              color: '#1e293b',
+              marginBottom: '12px'
+            }}>
+              Ready to submit your vote?
+            </h3>
+            <p style={{
+              fontSize: '1rem',
+              color: allPositionsSelected() ? '#059669' : '#ef4444',
+              marginBottom: '24px',
+              fontWeight: '700'
+            }}>
+              {allPositionsSelected() 
+                ? 'All positions selected. Click submit below.' 
+                : `Please select ${positions.length - Object.keys(selectedVotes).length} more position(s)`}
+            </p>
+            
+            <button
+              onClick={handleSubmit}
+              disabled={!allPositionsSelected() || submitting}
+              style={{
+                background: allPositionsSelected() && !submitting
+                  ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                  : '#cbd5e1',
+                color: 'white',
+                border: 'none',
+                borderRadius: '16px',
+                padding: '18px 48px',
+                fontSize: '1.1rem',
+                fontWeight: '700',
+                cursor: allPositionsSelected() && !submitting ? 'pointer' : 'not-allowed',
+                boxShadow: allPositionsSelected() && !submitting
+                  ? '8px 8px 16px #b8bec5, -8px -8px 16px #ffffff'
+                  : 'inset 4px 4px 8px #b8bec5, inset -4px -4px 8px #ffffff',
+                transition: 'all 0.3s ease',
+                opacity: allPositionsSelected() && !submitting ? 1 : 0.6,
+                transform: 'scale(1)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}
+              onMouseEnter={(e) => {
+                if (allPositionsSelected() && !submitting) {
+                  e.currentTarget.style.boxShadow = 'inset 5px 5px 10px #059669, inset -5px -5px 10px #34d399';
+                  e.currentTarget.style.transform = 'scale(0.98)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (allPositionsSelected() && !submitting) {
+                  e.currentTarget.style.boxShadow = '8px 8px 16px #b8bec5, -8px -8px 16px #ffffff';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }
+              }}
+            >
+              {submitting ? (
+                <>
+                  <span style={{
+                    display: 'inline-block',
+                    width: '18px',
+                    height: '18px',
+                    border: '3px solid rgba(255,255,255,0.3)',
+                    borderTopColor: 'white',
+                    borderRadius: '50%',
+                    animation: 'spin 0.8s linear infinite'
+                  }} />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Send size={20} strokeWidth={2.5} />
+                  Submit My Vote
+                </>
+              )}
+            </button>
           </div>
 
           {/* Important Notice */}
-          <div className="mt-6 glass-effect rounded-lg p-4 border-l-4 border-gold-400">
-            <div className="flex items-start">
-              <svg className="w-5 h-5 text-gold-400 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-              </svg>
-              <p className="text-sm text-white/80">
-                <span className="font-bold text-gold-300">⚠️ Important:</span> Once you submit your vote, you cannot change it. Please review your selections carefully before submitting.
+          <div style={{
+            background: '#e0e5ec',
+            borderRadius: '16px',
+            padding: '24px',
+            boxShadow: 'inset 5px 5px 10px #f59e0b, inset -5px -5px 10px #fcd34d',
+            border: '2px solid #fbbf24',
+            textAlign: 'center'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px'
+            }}>
+              <AlertCircle size={20} color="#92400e" strokeWidth={2.5} />
+              <p style={{
+                color: '#92400e',
+                fontSize: '0.95rem',
+                fontWeight: '700',
+                margin: 0,
+                lineHeight: '1.6'
+              }}>
+                <strong>Important:</strong> Once you submit your vote, you cannot change it. 
+                Please review your selections carefully before submitting.
               </p>
             </div>
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </>
   );
 };

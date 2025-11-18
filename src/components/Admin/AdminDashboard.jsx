@@ -4,6 +4,18 @@ import { useVotes } from '../../hooks/useVotes';
 import { getAllPositions } from '../../config/positions';
 import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
+import { 
+  BarChart3, 
+  Users, 
+  CheckSquare, 
+  Briefcase, 
+  Radio, 
+  Lock, 
+  FileText, 
+  Download,
+  FileSpreadsheet,
+  FileBarChart
+} from 'lucide-react';
 import Navbar from '../Shared/Navbar';
 import ResultsChart from './ResultsChart';
 import LoadingSpinner from '../Shared/LoadingSpinner';
@@ -34,6 +46,83 @@ const AdminDashboard = () => {
     setLastUpdate(new Date());
   }, [votes]);
 
+  // Export functions
+  const exportToPDF = () => {
+    const content = generateExportContent();
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `IndabaX_Election_Results_${new Date().toISOString().split('T')[0]}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportToExcel = () => {
+    const csv = generateCSVContent();
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `IndabaX_Election_Results_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportToCSV = () => {
+    const csv = generateCSVContent();
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `IndabaX_Election_Results_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const generateExportContent = () => {
+    let content = 'INDABAX CLUB ELECTION RESULTS\n';
+    content += '=================================\n\n';
+    content += `Generated: ${new Date().toLocaleString()}\n`;
+    content += `Total Voters: ${totalVoters}\n`;
+    content += `Total Votes Cast: ${getTotalVotes()}\n`;
+    content += `Total Positions: ${positions.length}\n\n`;
+    
+    positions.forEach(position => {
+      const positionVotes = getPositionVotes(position.id);
+      content += `\n${position.name.toUpperCase()}\n`;
+      content += '-'.repeat(position.name.length) + '\n';
+      
+      if (positionVotes && positionVotes.length > 0) {
+        positionVotes.forEach((vote, index) => {
+          content += `${index + 1}. ${vote.candidateName}: ${vote.count} votes\n`;
+        });
+      } else {
+        content += 'No votes recorded\n';
+      }
+    });
+    
+    return content;
+  };
+
+  const generateCSVContent = () => {
+    let csv = 'Position,Candidate,Votes,Percentage\n';
+    
+    positions.forEach(position => {
+      const positionVotes = getPositionVotes(position.id);
+      const total = positionVotes.reduce((sum, v) => sum + v.count, 0);
+      
+      if (positionVotes && positionVotes.length > 0) {
+        positionVotes.forEach(vote => {
+          const percentage = total > 0 ? ((vote.count / total) * 100).toFixed(2) : '0.00';
+          csv += `"${position.name}","${vote.candidateName}",${vote.count},${percentage}%\n`;
+        });
+      }
+    });
+    
+    return csv;
+  };
+
   if (votesLoading) {
     return <LoadingSpinner message="Loading election results..." />;
   }
@@ -51,9 +140,7 @@ const AdminDashboard = () => {
                 background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
                 boxShadow: '8px 8px 16px #b8bec5, -8px -8px 16px #ffffff'
               }}>
-                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
+                <BarChart3 className="w-12 h-12 text-white" />
               </div>
             </div>
             <h1 className="text-5xl font-bold mb-4" style={{ 
@@ -82,9 +169,7 @@ const AdminDashboard = () => {
                   background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
                   boxShadow: '4px 4px 8px #b8bec5, -4px -4px 8px #ffffff'
                 }}>
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
+                  <Users className="w-6 h-6 text-white" />
                 </div>
               </div>
               <p className="text-4xl font-bold" style={{ color: '#f59e0b' }}>{totalVoters}</p>
@@ -102,9 +187,7 @@ const AdminDashboard = () => {
                   background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
                   boxShadow: '4px 4px 8px #b8bec5, -4px -4px 8px #ffffff'
                 }}>
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                  </svg>
+                  <CheckSquare className="w-6 h-6 text-white" />
                 </div>
               </div>
               <p className="text-4xl font-bold" style={{ color: '#a855f7' }}>{getTotalVotes()}</p>
@@ -122,9 +205,7 @@ const AdminDashboard = () => {
                   background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
                   boxShadow: '4px 4px 8px #b8bec5, -4px -4px 8px #ffffff'
                 }}>
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
+                  <Briefcase className="w-6 h-6 text-white" />
                 </div>
               </div>
               <p className="text-4xl font-bold" style={{ color: '#3b82f6' }}>{positions.length}</p>
@@ -142,6 +223,7 @@ const AdminDashboard = () => {
                 backgroundColor: '#10b981',
                 boxShadow: '0 0 10px #10b981'
               }}></div>
+              <Radio className="w-5 h-5 text-green-500" />
               <span className="text-gray-700 font-medium">Live Updates Active</span>
             </div>
             <span className="text-gray-500 text-sm">
@@ -159,9 +241,7 @@ const AdminDashboard = () => {
                 background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
                 boxShadow: '4px 4px 8px #b8bec5, -4px -4px 8px #ffffff'
               }}>
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
+                <Lock className="w-6 h-6 text-white" />
               </div>
               <div>
                 <p className="font-semibold text-gray-700">Logged in as Admin</p>
@@ -204,7 +284,8 @@ const AdminDashboard = () => {
             <p className="text-gray-600 mb-4">Download election results for official records</p>
             <div className="flex flex-wrap justify-center gap-4">
               <button 
-                className="px-6 py-3 font-bold rounded-lg transform transition-all duration-300"
+                onClick={exportToPDF}
+                className="flex items-center space-x-2 px-6 py-3 font-bold rounded-lg transform transition-all duration-300"
                 style={{
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   color: 'white',
@@ -219,10 +300,12 @@ const AdminDashboard = () => {
                   e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
-                📊 Export as PDF
+                <FileText className="w-5 h-5" />
+                <span>Export as TXT</span>
               </button>
               <button 
-                className="px-6 py-3 font-bold rounded-lg transform transition-all duration-300"
+                onClick={exportToExcel}
+                className="flex items-center space-x-2 px-6 py-3 font-bold rounded-lg transform transition-all duration-300"
                 style={{
                   background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
                   color: 'white',
@@ -237,10 +320,12 @@ const AdminDashboard = () => {
                   e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
-                📑 Export as Excel
+                <FileSpreadsheet className="w-5 h-5" />
+                <span>Export as CSV</span>
               </button>
               <button 
-                className="px-6 py-3 font-bold rounded-lg transform transition-all duration-300"
+                onClick={exportToCSV}
+                className="flex items-center space-x-2 px-6 py-3 font-bold rounded-lg transform transition-all duration-300"
                 style={{
                   background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
                   color: 'white',
@@ -255,10 +340,10 @@ const AdminDashboard = () => {
                   e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
-                📄 Export as CSV
+                <Download className="w-5 h-5" />
+                <span>Quick Download</span>
               </button>
             </div>
-            <p className="text-xs text-gray-400 mt-4">Export functionality coming soon</p>
           </div>
         </div>
       </div>

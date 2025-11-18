@@ -10,14 +10,12 @@ const VerifyEmail = () => {
   const [checking, setChecking] = useState(false);
   const navigate = useNavigate();
 
-  // Check on mount if user is already verified
   useEffect(() => {
     if (!currentUser) {
       navigate('/login');
       return;
     }
 
-    // If already verified, go to voting page
     if (currentUser.emailVerified) {
       navigate('/vote');
     }
@@ -68,17 +66,37 @@ const VerifyEmail = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center animate-slide-up">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#e0e5ec' }}>
+        <div 
+          className="max-w-md w-full p-8 rounded-3xl text-center animate-slide-up"
+          style={{
+            background: '#e0e5ec',
+            boxShadow: '10px 10px 20px #b8bec5, -10px -10px 20px #ffffff'
+          }}
+        >
           {/* Email Icon */}
-          <div className="relative w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            
+          <div className="relative inline-block mb-6">
+            <div 
+              className="w-20 h-20 rounded-full flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                boxShadow: '5px 5px 10px #b8bec5, -5px -5px 10px #ffffff'
+              }}
+            >
+              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+
             {/* Checking indicator */}
             {checking && (
-              <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
+              <div 
+                className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center animate-pulse"
+                style={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  boxShadow: '2px 2px 4px #b8bec5, -2px -2px 4px #ffffff'
+                }}
+              >
                 <svg className="w-4 h-4 text-white animate-spin" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -87,40 +105,73 @@ const VerifyEmail = () => {
             )}
           </div>
 
-          <h2 className="text-3xl font-bold gradient-text mb-4">
+          <h2 
+            className="text-3xl font-bold mb-4"
+            style={{
+              background: 'linear-gradient(135deg, #fbbf24 0%, #a855f7 50%, #3b82f6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
             Verify Your Email
           </h2>
           
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 mb-3 text-sm">
             We've sent a verification email to:
           </p>
           
-          <p className="text-purple-600 font-semibold text-lg mb-6">
-            {currentUser?.email}
-          </p>
+          <div 
+            className="px-4 py-2 rounded-xl mb-6 inline-block"
+            style={{
+              background: '#e0e5ec',
+              boxShadow: 'inset 3px 3px 6px #b8bec5, inset -3px -3px 6px #ffffff'
+            }}
+          >
+            <p className="text-amber-600 font-bold text-sm">
+              {currentUser?.email}
+            </p>
+          </div>
 
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 text-left">
-            <p className="text-sm text-blue-800">
-              <span className="font-semibold">📋 Next Steps:</span>
+          {/* Instructions */}
+          <div 
+            className="p-4 rounded-xl mb-6 text-left"
+            style={{
+              background: '#e0e5ec',
+              boxShadow: 'inset 5px 5px 10px #b8bec5, inset -5px -5px 10px #ffffff'
+            }}
+          >
+            <p className="text-sm text-gray-700 leading-relaxed">
+              <span className="font-bold text-amber-600">📋 Next Steps:</span>
               <br />
-              1. Check your inbox (and spam folder)
-              <br />
-              2. Click the verification link in the email
-              <br />
-              3. Come back here and click "I've Verified - Check Now"
+              <span className="block mt-2">1. Check your inbox (and spam folder)</span>
+              <span className="block mt-1">2. Click the verification link in the email</span>
+              <span className="block mt-1">3. Come back here and click "I've Verified"</span>
             </p>
           </div>
 
           {/* Status Messages */}
           {message && (
-            <div className={`p-4 rounded-lg mb-4 animate-slide-up ${
-              message.includes('Failed') || message.includes('not verified')
-                ? 'bg-red-50 text-red-700 border-l-4 border-red-500' 
-                : message.includes('verified')
-                ? 'bg-green-50 text-green-700 border-l-4 border-green-500'
-                : 'bg-blue-50 text-blue-700 border-l-4 border-blue-500'
-            }`}>
-              <p className="font-medium">{message}</p>
+            <div 
+              className="p-4 rounded-xl mb-4 animate-fade-in"
+              style={{
+                background: '#e0e5ec',
+                boxShadow: message.includes('Failed') || message.includes('not verified')
+                  ? 'inset 5px 5px 10px #dc2626, inset -5px -5px 10px #fca5a5'
+                  : message.includes('verified')
+                  ? 'inset 5px 5px 10px #10b981, inset -5px -5px 10px #6ee7b7'
+                  : 'inset 5px 5px 10px #3b82f6, inset -5px -5px 10px #93c5fd'
+              }}
+            >
+              <p className={`font-medium text-sm ${
+                message.includes('Failed') || message.includes('not verified')
+                  ? 'text-red-700'
+                  : message.includes('verified')
+                  ? 'text-green-700'
+                  : 'text-blue-700'
+              }`}>
+                {message}
+              </p>
             </div>
           )}
 
@@ -129,42 +180,73 @@ const VerifyEmail = () => {
             <button
               onClick={handleManualCheck}
               disabled={checking}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-lg hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 rounded-xl font-bold transition-all duration-300 disabled:opacity-50"
+              style={{
+                background: checking 
+                  ? '#e0e5ec'
+                  : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                color: 'white',
+                boxShadow: checking
+                  ? 'inset 5px 5px 10px #b8bec5, inset -5px -5px 10px #ffffff'
+                  : '5px 5px 10px #b8bec5, -5px -5px 10px #ffffff'
+              }}
+              onMouseEnter={(e) => {
+                if (!checking) {
+                  e.currentTarget.style.boxShadow = 'inset 5px 5px 10px #d97706, inset -5px -5px 10px #fcd34d';
+                  e.currentTarget.style.transform = 'scale(0.98)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!checking) {
+                  e.currentTarget.style.boxShadow = '5px 5px 10px #b8bec5, -5px -5px 10px #ffffff';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }
+              }}
             >
-              {checking ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Checking...
-                </span>
-              ) : (
-                "✅ I've Verified - Check Now"
-              )}
+              {checking ? '🔄 Checking...' : "✅ I've Verified - Check Now"}
             </button>
 
             <button
               onClick={handleResend}
               disabled={resending}
-              className="w-full py-3 bg-white border-2 border-purple-600 text-purple-600 font-bold rounded-lg hover:bg-purple-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 rounded-xl font-bold transition-all duration-300 disabled:opacity-50"
+              style={{
+                background: '#e0e5ec',
+                color: '#d97706',
+                boxShadow: '5px 5px 10px #b8bec5, -5px -5px 10px #ffffff'
+              }}
+              onMouseEnter={(e) => {
+                if (!resending) {
+                  e.currentTarget.style.boxShadow = 'inset 5px 5px 10px #b8bec5, inset -5px -5px 10px #ffffff';
+                  e.currentTarget.style.transform = 'scale(0.98)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!resending) {
+                  e.currentTarget.style.boxShadow = '5px 5px 10px #b8bec5, -5px -5px 10px #ffffff';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }
+              }}
             >
-              {resending ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Sending...
-                </span>
-              ) : (
-                '📧 Resend Verification Email'
-              )}
+              {resending ? '📧 Sending...' : '📧 Resend Verification Email'}
             </button>
 
             <button
               onClick={handleLogout}
-              className="w-full py-3 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-all duration-300"
+              className="w-full py-3 rounded-xl font-medium transition-all duration-300"
+              style={{
+                background: '#e0e5ec',
+                color: '#6b7280',
+                boxShadow: '5px 5px 10px #b8bec5, -5px -5px 10px #ffffff'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = 'inset 5px 5px 10px #b8bec5, inset -5px -5px 10px #ffffff';
+                e.currentTarget.style.transform = 'scale(0.98)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = '5px 5px 10px #b8bec5, -5px -5px 10px #ffffff';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
             >
               🚪 Logout
             </button>
@@ -176,6 +258,36 @@ const VerifyEmail = () => {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .animate-slide-up {
+          animation: slideUp 0.6s ease-out;
+        }
+
+        .animate-fade-in {
+          animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+          from {
+            transform: translateY(30px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+      `}</style>
     </>
   );
 };

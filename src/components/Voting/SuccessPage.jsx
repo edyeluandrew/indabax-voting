@@ -16,17 +16,37 @@ const SuccessPage = () => {
     <>
       <Navbar />
       
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 flex items-center justify-center p-4 animate-fade-in">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-2xl w-full text-center animate-slide-up">
+      <div className="min-h-screen flex items-center justify-center p-4 animate-fade-in" style={{ backgroundColor: '#e0e5ec' }}>
+        <div 
+          className="p-8 md:p-12 max-w-2xl w-full rounded-3xl text-center animate-slide-up"
+          style={{
+            background: '#e0e5ec',
+            boxShadow: '10px 10px 20px #b8bec5, -10px -10px 20px #ffffff'
+          }}
+        >
           {/* Success Icon */}
-          <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce-slow">
+          <div 
+            className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce-slow"
+            style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              boxShadow: '5px 5px 10px #b8bec5, -5px -5px 10px #ffffff'
+            }}
+          >
             <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
             </svg>
           </div>
 
           {/* Success Message */}
-          <h1 className="text-4xl md:text-5xl font-bold gradient-text mb-4">
+          <h1 
+            className="text-4xl md:text-5xl font-bold mb-4"
+            style={{
+              background: 'linear-gradient(135deg, #fbbf24 0%, #a855f7 50%, #3b82f6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
             Vote Submitted!
           </h1>
           
@@ -35,16 +55,29 @@ const SuccessPage = () => {
           </p>
 
           {/* Vote Details */}
-          <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-xl p-6 mb-8">
+          <div 
+            className="p-6 rounded-xl mb-8"
+            style={{
+              background: '#e0e5ec',
+              boxShadow: 'inset 5px 5px 10px #b8bec5, inset -5px -5px 10px #ffffff'
+            }}
+          >
             <div className="space-y-3 text-left">
               <div className="flex justify-between items-center">
                 <span className="text-gray-700 font-medium">Voter Email:</span>
-                <span className="text-purple-700 font-bold">{currentUser?.email}</span>
+                <span className="text-amber-600 font-bold text-sm">{currentUser?.email}</span>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-gray-700 font-medium">Status:</span>
-                <span className="px-3 py-1 bg-green-100 text-green-700 font-bold rounded-full text-sm">
+                <span 
+                  className="px-3 py-1 rounded-full text-sm font-bold"
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    color: 'white',
+                    boxShadow: '2px 2px 4px #b8bec5, -2px -2px 4px #ffffff'
+                  }}
+                >
                   ✓ RECORDED
                 </span>
               </div>
@@ -60,45 +93,76 @@ const SuccessPage = () => {
 
           {/* Information Cards */}
           <div className="grid md:grid-cols-2 gap-4 mb-8">
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg text-left">
-              <h3 className="font-bold text-blue-800 mb-2">✓ Your Vote is Secure</h3>
-              <p className="text-sm text-blue-700">
+            <div 
+              className="p-4 rounded-xl text-left"
+              style={{
+                background: '#e0e5ec',
+                boxShadow: 'inset 3px 3px 6px #b8bec5, inset -3px -3px 6px #ffffff'
+              }}
+            >
+              <h3 className="font-bold text-blue-700 mb-2">✓ Your Vote is Secure</h3>
+              <p className="text-sm text-gray-700">
                 Your vote has been encrypted and stored securely. It cannot be changed or deleted.
               </p>
             </div>
 
-            <div className="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-lg text-left">
-              <h3 className="font-bold text-purple-800 mb-2">✓ Anonymous Voting</h3>
-              <p className="text-sm text-purple-700">
+            <div 
+              className="p-4 rounded-xl text-left"
+              style={{
+                background: '#e0e5ec',
+                boxShadow: 'inset 3px 3px 6px #b8bec5, inset -3px -3px 6px #ffffff'
+              }}
+            >
+              <h3 className="font-bold text-purple-700 mb-2">✓ Anonymous Voting</h3>
+              <p className="text-sm text-gray-700">
                 Your vote is completely anonymous. No one can see who you voted for.
               </p>
             </div>
           </div>
 
           {/* Next Steps */}
-          <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl p-6 mb-8">
+          <div 
+            className="p-6 rounded-xl mb-8"
+            style={{
+              background: '#e0e5ec',
+              boxShadow: 'inset 5px 5px 10px #b8bec5, inset -5px -5px 10px #ffffff'
+            }}
+          >
             <h3 className="text-lg font-bold text-gray-800 mb-3">📋 What Happens Next?</h3>
             <ul className="text-left text-sm text-gray-700 space-y-2">
               <li className="flex items-start">
-                <span className="text-green-500 font-bold mr-2">1.</span>
+                <span className="text-green-600 font-bold mr-2">1.</span>
                 <span>Results will be announced by the election committee</span>
               </li>
               <li className="flex items-start">
-                <span className="text-green-500 font-bold mr-2">2.</span>
+                <span className="text-green-600 font-bold mr-2">2.</span>
                 <span>Watch out for official announcements on club channels</span>
               </li>
               <li className="flex items-start">
-                <span className="text-green-500 font-bold mr-2">3.</span>
+                <span className="text-green-600 font-bold mr-2">3.</span>
                 <span>Congratulate the winners and support your new leaders!</span>
               </li>
             </ul>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Button */}
           <div className="space-y-3">
             <button
               onClick={handleLogout}
-              className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold text-lg rounded-lg hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-300 shadow-lg"
+              className="w-full py-4 rounded-xl font-bold text-lg transition-all duration-300"
+              style={{
+                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                color: 'white',
+                boxShadow: '5px 5px 10px #b8bec5, -5px -5px 10px #ffffff'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = 'inset 5px 5px 10px #d97706, inset -5px -5px 10px #fcd34d';
+                e.currentTarget.style.transform = 'scale(0.98)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = '5px 5px 10px #b8bec5, -5px -5px 10px #ffffff';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
             >
               Logout
             </button>
@@ -109,13 +173,56 @@ const SuccessPage = () => {
           </div>
 
           {/* Footer Message */}
-          <div className="mt-8 pt-6 border-t-2 border-gray-200">
+          <div className="mt-8 pt-6" style={{ borderTop: '2px solid #d1d5db' }}>
             <p className="text-gray-600 font-medium">
               Thank you for being part of IndabaX Club! 🎉
             </p>
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .animate-fade-in {
+          animation: fadeIn 0.6s ease-out;
+        }
+
+        .animate-slide-up {
+          animation: slideUp 0.6s ease-out;
+        }
+
+        .animate-bounce-slow {
+          animation: bounceSlow 2s ease-in-out infinite;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes slideUp {
+          from {
+            transform: translateY(30px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes bounceSlow {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+      `}</style>
     </>
   );
 };
