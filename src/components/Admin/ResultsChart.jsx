@@ -147,7 +147,7 @@ const ResultsChart = ({ position, votes }) => {
     );
   };
 
-  // Download chart as PNG - Robust method that works for all charts
+  // Download chart as PNG - Fixed to capture SVG properly
   const downloadChart = async () => {
     try {
       setIsDownloading(true);
@@ -159,39 +159,24 @@ const ResultsChart = ({ position, votes }) => {
         return;
       }
 
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       const positionTitle = position?.title || position?.name || 'position';
       const fileName = `${positionTitle}_results_${new Date().toISOString().split('T')[0]}.png`;
       
-      // Clone the element to isolate it
-      const clonedElement = element.cloneNode(true);
-      clonedElement.style.position = 'fixed';
-      clonedElement.style.left = '-9999px';
-      clonedElement.style.top = '-9999px';
-      clonedElement.style.zIndex = '-9999';
-      document.body.appendChild(clonedElement);
-
       try {
-        // Use html2canvas with strict error suppression
-        const canvas = await html2canvas(clonedElement, {
+        // Use html2canvas directly on the element with better settings
+        const canvas = await html2canvas(element, {
           backgroundColor: '#e0e5ec',
           scale: 2,
           logging: false,
           useCORS: true,
           allowTaint: true,
-          foreignObjectRendering: true,
-          onclone: (clonedDocument) => {
-            // Remove problematic style tags and links
-            const styleTags = clonedDocument.querySelectorAll('style, link[rel="stylesheet"]');
-            styleTags.forEach(tag => {
-              try {
-                tag.remove();
-              } catch (e) {
-                console.warn('Could not remove style tag:', e);
-              }
-            });
-          }
+          foreignObjectRendering: false,
+          imageTimeout: 0,
+          removeContainer: false,
+          width: element.offsetWidth,
+          height: element.offsetHeight
         });
         
         // Convert canvas to blob and download
@@ -203,12 +188,10 @@ const ResultsChart = ({ position, votes }) => {
           link.click();
           document.body.removeChild(link);
           URL.revokeObjectURL(link.href);
-          document.body.removeChild(clonedElement);
           setIsDownloading(false);
         }, 'image/png', 0.95);
       } catch (renderErr) {
         console.error('Rendering error:', renderErr);
-        document.body.removeChild(clonedElement);
         setIsDownloading(false);
         alert('Failed to download chart. Please try again.');
       }
