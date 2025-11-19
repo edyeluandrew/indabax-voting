@@ -2,22 +2,18 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 
-// Auth Components
 import Signup from './components/Auth/Signup';
 import Login from './components/Auth/Login';
 import EmailVerification from './components/Auth/EmailVerification';
 
-// Voting Components
 import VotingPage from './components/Voting/VotingPage';
 import SuccessPage from './components/Voting/SuccessPage';
 
-// Admin Components
 import AdminDashboard from './components/Admin/AdminDashboard';
 import ClearDatabaseAdmin from './components/Admin/ClearDatabaseAdmin';
 
-// Shared Components
 import ProtectedRoute from './components/Shared/ProtectedRoute';
-import LoadingSpinner from './components/Shared/LoadingSpinner';
+// import LoadingSpinner from './components/Shared/LoadingSpinner';
 
 function App() {
   return (

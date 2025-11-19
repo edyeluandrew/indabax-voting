@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useVotes } from '../../hooks/useVotes';
 import { getAllPositions } from '../../config/positions';
-import { collection, query, getDocs, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { Link } from 'react-router-dom';
 import { 
@@ -15,7 +15,7 @@ import {
   FileText, 
   Download,
   FileSpreadsheet,
-  FileBarChart,
+  // FileBarChart,
   RefreshCw,
   Trash2
 } from 'lucide-react';

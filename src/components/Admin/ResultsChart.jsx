@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { Trophy, TrendingUp, Download } from 'lucide-react';
-import { toPng } from 'html-to-image';
+import { Trophy , Download } from 'lucide-react';
+// import { toPng } from 'html-to-image';
 import { getCandidateById } from '../../config/positions';
 import html2canvas from 'html2canvas';
 
