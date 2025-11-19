@@ -13,6 +13,7 @@ import SuccessPage from './components/Voting/SuccessPage';
 
 // Admin Components
 import AdminDashboard from './components/Admin/AdminDashboard';
+import ClearDatabaseAdmin from './components/Admin/ClearDatabaseAdmin';
 
 // Shared Components
 import ProtectedRoute from './components/Shared/ProtectedRoute';
@@ -63,6 +64,15 @@ function App() {
               element={
                 <ProtectedRoute adminOnly={true}>
                   <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/admin/clear-database" 
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <ClearDatabaseAdmin />
                 </ProtectedRoute>
               } 
             />

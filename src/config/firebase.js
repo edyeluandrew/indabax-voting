@@ -2,7 +2,6 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// Firebase configuration from environment variables
 const firebaseConfig = {
   apiKey: "AIzaSyCwzfGQXJh8OO_lxJ7vccUzYdRczMgdzQ8",
   authDomain: "indabaxvoting.firebaseapp.com",
@@ -13,10 +12,8 @@ const firebaseConfig = {
   measurementId: "G-VYYXVJBS5S"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 

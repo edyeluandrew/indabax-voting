@@ -26,3 +26,9 @@ yarn-error.log*
 .firebase/
 .firebaserc
 firebase-debug.log
+
+# Admin scripts (sensitive)
+serviceAccountKey.json
+set-admin.js
+verify-email.js
+get-user.js

@@ -3,9 +3,11 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import { Trophy, TrendingUp, Download } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { getCandidateById } from '../../config/positions';
+import html2canvas from 'html2canvas';
 
 const ResultsChart = ({ position, votes }) => {
   const chartRef = useRef();
+  const [isDownloading, setIsDownloading] = React.useState(false);
 
   // Ensure votes is always an array and has valid structure
   const safeVotes = (() => {
@@ -147,31 +149,81 @@ const ResultsChart = ({ position, votes }) => {
     );
   };
 
-  // Download chart as PNG
+  // Download chart as PNG - Robust method that works for all charts
   const downloadChart = async () => {
-    if (chartRef.current === null) {
-      return;
-    }
-
     try {
-      const dataUrl = await toPng(chartRef.current, { 
-        cacheBust: true,
-        backgroundColor: '#e0e5ec',
-        quality: 0.95,
-        pixelRatio: 2
-      });
+      setIsDownloading(true);
       
-      const link = document.createElement('a');
-      link.download = `${position?.name || 'position'}_results.png`;
-      link.href = dataUrl;
-      link.click();
+      const element = chartRef.current;
+      if (!element) {
+        console.error('Chart element not found');
+        setIsDownloading(false);
+        return;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      const positionTitle = position?.title || position?.name || 'position';
+      const fileName = `${positionTitle}_results_${new Date().toISOString().split('T')[0]}.png`;
+      
+      // Clone the element to isolate it
+      const clonedElement = element.cloneNode(true);
+      clonedElement.style.position = 'fixed';
+      clonedElement.style.left = '-9999px';
+      clonedElement.style.top = '-9999px';
+      clonedElement.style.zIndex = '-9999';
+      document.body.appendChild(clonedElement);
+
+      try {
+        // Use html2canvas with strict error suppression
+        const canvas = await html2canvas(clonedElement, {
+          backgroundColor: '#e0e5ec',
+          scale: 2,
+          logging: false,
+          useCORS: true,
+          allowTaint: true,
+          foreignObjectRendering: true,
+          onclone: (clonedDocument) => {
+            // Remove problematic style tags and links
+            const styleTags = clonedDocument.querySelectorAll('style, link[rel="stylesheet"]');
+            styleTags.forEach(tag => {
+              try {
+                tag.remove();
+              } catch (e) {
+                console.warn('Could not remove style tag:', e);
+              }
+            });
+          }
+        });
+        
+        // Convert canvas to blob and download
+        canvas.toBlob((blob) => {
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(link.href);
+          document.body.removeChild(clonedElement);
+          setIsDownloading(false);
+        }, 'image/png', 0.95);
+      } catch (renderErr) {
+        console.error('Rendering error:', renderErr);
+        document.body.removeChild(clonedElement);
+        setIsDownloading(false);
+        alert('Failed to download chart. Please try again.');
+      }
+      
     } catch (err) {
       console.error('Error downloading chart:', err);
+      setIsDownloading(false);
+      alert('Failed to download chart. Please try again.');
     }
   };
 
-  // Safe position name
-  const positionName = position?.name || 'Unknown Position';
+  // Safe position name - use 'title' instead of 'name'
+  const positionName = position?.title || position?.name || 'Unknown Position';
 
   return (
     <div 
@@ -185,23 +237,29 @@ const ResultsChart = ({ position, votes }) => {
       {/* Download Button */}
       <button
         onClick={downloadChart}
+        disabled={isDownloading}
         className="absolute top-4 right-4 flex items-center space-x-2 px-4 py-2 font-bold rounded-lg transform transition-all duration-300 z-10"
         style={{
-          background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+          background: isDownloading ? '#9ca3af' : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
           color: 'white',
-          boxShadow: '4px 4px 8px #b8bec5, -4px -4px 8px #ffffff'
+          boxShadow: '4px 4px 8px #b8bec5, -4px -4px 8px #ffffff',
+          cursor: isDownloading ? 'not-allowed' : 'pointer'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = 'inset 4px 4px 8px #1d4ed8, inset -4px -4px 8px #60a5fa';
-          e.currentTarget.style.transform = 'scale(0.95)';
+          if (!isDownloading) {
+            e.currentTarget.style.boxShadow = 'inset 4px 4px 8px #1d4ed8, inset -4px -4px 8px #60a5fa';
+            e.currentTarget.style.transform = 'scale(0.95)';
+          }
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = '4px 4px 8px #b8bec5, -4px -4px 8px #ffffff';
-          e.currentTarget.style.transform = 'scale(1)';
+          if (!isDownloading) {
+            e.currentTarget.style.boxShadow = '4px 4px 8px #b8bec5, -4px -4px 8px #ffffff';
+            e.currentTarget.style.transform = 'scale(1)';
+          }
         }}
       >
         <Download className="w-4 h-4" />
-        <span className="text-sm">Download</span>
+        <span className="text-sm">{isDownloading ? 'Downloading...' : 'Download'}</span>
       </button>
 
       {/* Position Header */}
@@ -240,7 +298,7 @@ const ResultsChart = ({ position, votes }) => {
                   innerRadius={40}
                   fill="#8884d8"
                   dataKey="value"
-                  paddingAngle={1} // Small gap between slices
+                  paddingAngle={1}
                 >
                   {chartData.map((entry, index) => (
                     <Cell 

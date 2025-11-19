@@ -1,4 +1,3 @@
-// All positions and candidates for IndabaX Elections with images
 export const POSITIONS_DATA = {
   president: {
     id: 'president',

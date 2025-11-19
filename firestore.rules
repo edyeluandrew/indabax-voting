@@ -11,7 +11,7 @@ service cloud.firestore {
     // Helper function to check if user is admin
     function isAdmin() {
       return request.auth != null && 
-             request.auth.token.email == '2023akcs4987gf@kab.ac.ug';
+             request.auth.token.admin == true;
     }
     
     // Helper function to check if user has already voted
@@ -50,6 +50,9 @@ service cloud.firestore {
       
       // Admins can update account status (suspend, flag accounts)
       allow update: if isAdmin();
+      
+      // Admins can delete user profiles
+      allow delete: if isAdmin();
     }
     
     // ============================================
@@ -66,8 +69,11 @@ service cloud.firestore {
       // Users can read their own voting status
       allow read: if request.auth.uid == userId || isAdmin();
       
-      // No updates or deletes allowed (one vote per user forever)
-      allow update, delete: if false;
+      // Admins can delete voter records for database clearing
+      allow delete: if isAdmin();
+      
+      // No updates allowed (one vote per user forever)
+      allow update: if false;
     }
     
     // ============================================
@@ -85,7 +91,7 @@ service cloud.firestore {
       // Admins can read everything
       allow read: if isAdmin();
       
-      // No deletes allowed except by admin
+      // Admins can delete votes for database clearing
       allow delete: if isAdmin();
     }
     

@@ -4,6 +4,7 @@ import { useVotes } from '../../hooks/useVotes';
 import { getAllPositions } from '../../config/positions';
 import { collection, query, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../../config/firebase';
+import { Link } from 'react-router-dom';
 import { 
   BarChart3, 
   Users, 
@@ -15,7 +16,8 @@ import {
   Download,
   FileSpreadsheet,
   FileBarChart,
-  RefreshCw
+  RefreshCw,
+  Trash2
 } from 'lucide-react';
 import Navbar from '../Shared/Navbar';
 import ResultsChart from './ResultsChart';
@@ -111,8 +113,9 @@ const AdminDashboard = () => {
     
     positions.forEach(position => {
       const positionVotes = getPositionVotes(position.id);
-      content += `\n${position.name.toUpperCase()}\n`;
-      content += '-'.repeat(position.name.length) + '\n';
+      const positionTitle = position.title || position.name || 'Unknown';
+      content += `\n${positionTitle.toUpperCase()}\n`;
+      content += '-'.repeat(positionTitle.length) + '\n';
       
       if (positionVotes && positionVotes.length > 0) {
         positionVotes.forEach((vote, index) => {
@@ -131,12 +134,13 @@ const AdminDashboard = () => {
     
     positions.forEach(position => {
       const positionVotes = getPositionVotes(position.id);
+      const positionTitle = position.title || position.name || 'Unknown';
       const total = positionVotes.reduce((sum, v) => sum + v.count, 0);
       
       if (positionVotes && positionVotes.length > 0) {
         positionVotes.forEach(vote => {
           const percentage = total > 0 ? ((vote.count / total) * 100).toFixed(2) : '0.00';
-          csv += `"${position.name}","${vote.candidateName}",${vote.count},${percentage}%\n`;
+          csv += `"${positionTitle}","${vote.candidateName}",${vote.count},${percentage}%\n`;
         });
       }
     });
@@ -385,6 +389,36 @@ const AdminDashboard = () => {
                 <span>Quick Download</span>
               </button>
             </div>
+          </div>
+
+          {/* Clear Database Section */}
+          <div className="mt-12 rounded-xl p-6 text-center animate-slide-up" style={{
+            background: '#e0e5ec',
+            boxShadow: '8px 8px 16px #b8bec5, -8px -8px 16px #ffffff'
+          }}>
+            <h3 className="text-xl font-bold mb-4 text-red-600">⚠️ Admin Tools</h3>
+            <p className="text-gray-600 mb-4">Manage database and reset election data</p>
+            <Link 
+              to="/admin/clear-database"
+              className="inline-flex items-center space-x-2 px-6 py-3 font-bold rounded-lg transform transition-all duration-300"
+              style={{
+                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                color: 'white',
+                boxShadow: '4px 4px 8px #b8bec5, -4px -4px 8px #ffffff',
+                textDecoration: 'none'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = 'inset 4px 4px 8px #991b1b, inset -4px -4px 8px #fca5a5';
+                e.currentTarget.style.transform = 'scale(0.98)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = '4px 4px 8px #b8bec5, -4px -4px 8px #ffffff';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
+              <Trash2 className="w-5 h-5" />
+              <span>Clear Database</span>
+            </Link>
           </div>
         </div>
       </div>
