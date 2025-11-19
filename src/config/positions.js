@@ -77,7 +77,7 @@ export const POSITIONS_DATA = {
       },
       {
         id: 'kashta-frank',
-        name: 'KASHTA FRANK',
+        name: 'KASIITA FRANK',
         image: '/images/candidates/kashta-frank.jpg',
         bio: 'Candidate for Graphics Design Lead'
       }
@@ -119,7 +119,7 @@ export const POSITIONS_DATA = {
     candidates: [
       {
         id: 'namanje-sandra',
-        name: 'NAMANJE SANDRA',
+        name: 'NAMwANJE SANDRA',
         image: '/images/candidates/namanje-sandra.jpg',
         bio: 'Candidate for Speaker'
       }
