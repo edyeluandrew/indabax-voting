@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { Trophy , Download } from 'lucide-react';
-// import { toPng } from 'html-to-image';
+import { Trophy, TrendingUp, Download } from 'lucide-react';
+import { toPng } from 'html-to-image';
 import { getCandidateById } from '../../config/positions';
 import html2canvas from 'html2canvas';
 
@@ -43,9 +43,8 @@ const ResultsChart = ({ position, votes }) => {
     candidateDetails: vote.candidateDetails
   }));
 
-  // Sort to find winner
+  // Sort votes by count
   const sortedVotes = [...safeVotes].sort((a, b) => b.count - a.count);
-  const winner = sortedVotes[0];
 
   // Colors for pie chart
   const COLORS = [
