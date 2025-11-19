@@ -13,7 +13,6 @@ import AdminDashboard from './components/Admin/AdminDashboard';
 import ClearDatabaseAdmin from './components/Admin/ClearDatabaseAdmin';
 
 import ProtectedRoute from './components/Shared/ProtectedRoute';
-// import LoadingSpinner from './components/Shared/LoadingSpinner';
 
 function App() {
   return (

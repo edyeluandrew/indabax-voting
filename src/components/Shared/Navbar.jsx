@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { Vote, User, Shield, LogOut, Sparkles } from 'lucide-react';
+import { Vote, User, Shield, LogOut } from 'lucide-react';
 
 const Navbar = () => {
   const { currentUser, isAdmin, logout } = useAuth();

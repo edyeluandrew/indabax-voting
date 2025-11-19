@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, doc, getDoc, setDoc, onSnapshot, increment, writeBatch } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot, increment } from 'firebase/firestore';
 import { db, auth } from '../config/firebase';
 import { getAllPositions } from '../config/positions';
 
@@ -96,7 +96,7 @@ export const useVotes = () => {
 
       // CRITICAL FIX: Force token refresh to get latest email_verified status
       await auth.currentUser.reload();
-      const idTokenResult = await auth.currentUser.getIdToken(true);
+      await auth.currentUser.getIdToken(true);
       
       const userId = auth.currentUser.uid;
       const userEmail = auth.currentUser.email;
